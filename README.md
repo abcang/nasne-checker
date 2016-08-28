@@ -1,5 +1,6 @@
 nasne-checker
 ===
+[![npm version](https://badge.fury.io/js/nasne-checker.svg)](https://badge.fury.io/js/nasne-checker)
 
 A tool to check resavation on nasne and to post to slack.
 
