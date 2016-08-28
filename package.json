@@ -1,0 +1,30 @@
+{
+  "name": "nasne-checker",
+  "version": "1.0.0",
+  "description": "A tool to check resavation on nasne and to post to slack.",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "nasne-checker": "bin/nasne-checker.js"
+  },
+  "dependencies": {
+    "commander": "~2.9.0",
+    "moment": "~2.14.1",
+    "nasne": "https://github.com/naokiy/node-nasne.git",
+    "slack-notify": "~0.1.6"
+  },
+  "engines": {
+    "node": ">=6.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ABCanG/nasne-checker.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ABCanG/nasne-checker/issues"
+  },
+  "homepage": "https://github.com/ABCanG/nasne-checker",
+  "author": "ABCanG <abcang1015@gmail.com> (https://abcang.net/)",
+  "license": "MIT"
+}
