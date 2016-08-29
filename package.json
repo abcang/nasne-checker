@@ -1,17 +1,18 @@
 {
   "name": "nasne-checker",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A tool to check resavation on nasne and to post to slack.",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "main": "lib/nasne.js",
   "bin": {
     "nasne-checker": "bin/nasne-checker.js"
   },
   "dependencies": {
+    "axios": "~0.14.0",
     "commander": "~2.9.0",
     "moment": "~2.14.1",
-    "nasne": "https://github.com/naokiy/node-nasne.git",
     "slack-notify": "~0.1.6"
   },
   "engines": {

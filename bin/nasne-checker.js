@@ -3,7 +3,7 @@
 const program = require('commander');
 const slackInitializer = require('slack-notify');
 const moment = require('moment');
-const Nasne = require('../lib/nasne-wrapper');
+const Nasne = require('../lib/nasne');
 
 
 program.on('--help', () => {
@@ -15,7 +15,7 @@ program.on('--help', () => {
 });
 
 program
-  .version('1.0.0')
+  .version('1.1.1')
   .option('--nasne <host>', 'Nasne host (required)')
   .option('--slack <url>', 'Slack webhook url (required)')
   .option('--interval [hour]', 'Execution interval', 0)
@@ -49,7 +49,7 @@ function postWarning(text, attachment = null) {
 }
 
 function execute() {
-  nasne.getHDDDetailAsync().then((data) => {
+  nasne.getHddDetail().then((data) => {
     for (const hdd of data) {
       const parcent = Math.round((hdd.usedVolumeSize / hdd.totalVolumeSize) * 100);
       if (parcent > 90) {
@@ -57,11 +57,12 @@ function execute() {
         postWarning(`:floppy_disk: The capacity of the ${type} HDD is insufficient (${parcent}% used).`);
       }
     }
-  }, () => {
+  }, (data) => {
+    console.log(data);
     console.error('Failed to get information.');
   });
 
-  nasne.getReservedListAsync().then((data) => {
+  nasne.getReservedList().then((data) => {
     const itemList = data.item.sort((a, b) => (
       moment(a.startDateTime) - moment(b.startDateTime))
     );

@@ -2,7 +2,7 @@ nasne-checker
 ===
 [![npm version](https://badge.fury.io/js/nasne-checker.svg)](https://badge.fury.io/js/nasne-checker)
 
-A tool to check resavation on nasne and to post to slack.
+A tool to check resavation on nasne and post to slack.
 
 ## Install
 
@@ -34,6 +34,7 @@ $ nasne-checker --nasne 192.168.10.10 \
 ## Changelog
 * 1.0.0: First release.
 * 1.1.0: Support the case the reservation does not exist.
+* 1.1.1: Remove nasne module.
 
 ## License
 MIT
