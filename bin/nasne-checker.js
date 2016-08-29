@@ -31,15 +31,30 @@ if (!program.nasne || !program.slack) {
 const nasne = new Nasne(program.nasne);
 const slack = slackInitializer(program.slack);
 
+function convertField(item) {
+  const startTime = moment(item.startDateTime).format('YYYY/MM/DD(ddd) HH:mm');
+  const endTime = moment(item.startDateTime).add(item.duration, 's').format('HH:mm');
+  return {
+    title: item.title,
+    value: `${startTime} - ${endTime}`,
+    short: false
+  };
+}
+
+function postWarning(text, attachment = null) {
+  slack.request({
+    text,
+    attachments: [attachment]
+  });
+}
+
 function execute() {
   nasne.getHDDDetailAsync().then((data) => {
     for (const hdd of data) {
       const parcent = Math.round((hdd.usedVolumeSize / hdd.totalVolumeSize) * 100);
       if (parcent > 90) {
         const type = hdd.internalFlag ? 'External' : 'Internal';
-        slack.request({
-          text: `:floppy_disk: The capacity of the ${type} HDD is insufficient (${parcent}% used).`,
-        });
+        postWarning(`:floppy_disk: The capacity of the ${type} HDD is insufficient (${parcent}% used).`);
       }
     }
   }, () => {
@@ -47,26 +62,25 @@ function execute() {
   });
 
   nasne.getReservedListAsync().then((data) => {
-    const errorList = data.item.filter((item) => item.conflictId > 0)
-      .sort((a, b) => moment(a.startDateTime) - moment(b.startDateTime));
+    const itemList = data.item.sort((a, b) => (
+      moment(a.startDateTime) - moment(b.startDateTime))
+    );
 
-    const fields = errorList.map((item) => {
-      const startTime = moment(item.startDateTime).format('YYYY/MM/DD(ddd) HH:mm');
-      const endTime = moment(item.startDateTime).add(item.duration, 's').format('HH:mm');
-      return {
-        title: item.title,
-        value: `${startTime} - ${endTime}`,
-        short: false
-      };
-    });
-
-    slack.request({
-      text: ':warning: Reservations are duplicates.',
-      attachments: [{
+    const duplicateErrorFields = itemList.filter((item) => item.conflictId > 0).map(convertField);
+    if (duplicateErrorFields) {
+      postWarning(':warning: Reservations are duplicates.', {
         color: 'warning',
-        fields
-      }]
-    });
+        fields: duplicateErrorFields
+      });
+    }
+
+    const notExistErrorFields = itemList.filter((item) => item.eventId === 65536).map(convertField);
+    if (notExistErrorFields) {
+      postWarning(':exclamation: Reservations are not exist.', {
+        color: 'danger',
+        fields: notExistErrorFields
+      });
+    }
   }, () => {
     console.error('Failed to get information.');
   });

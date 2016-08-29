@@ -31,5 +31,9 @@ $ nasne-checker --nasne 192.168.10.10 \
   --interval 24
 ```
 
+## Changelog
+* 1.0.0: First release.
+* 1.1.0: Support the case the reservation does not exist.
+
 ## License
 MIT
