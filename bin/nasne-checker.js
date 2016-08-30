@@ -15,7 +15,7 @@ program.on('--help', () => {
 });
 
 program
-  .version('1.1.1')
+  .version('1.1.2')
   .option('--nasne <host>', 'Nasne host (required)')
   .option('--slack <url>', 'Slack webhook url (required)')
   .option('--interval [hour]', 'Execution interval', 0)
@@ -67,17 +67,17 @@ function execute() {
       moment(a.startDateTime) - moment(b.startDateTime))
     );
 
-    const duplicateErrorFields = itemList.filter((item) => item.conflictId > 0).map(convertField);
-    if (duplicateErrorFields) {
-      postWarning(':warning: Reservations are duplicates.', {
+    const overlapErrorFields = itemList.filter((item) => item.conflictId > 0).map(convertField);
+    if (overlapErrorFields) {
+      postWarning(':warning: Reservations are overlap.', {
         color: 'warning',
-        fields: duplicateErrorFields
+        fields: overlapErrorFields
       });
     }
 
     const notExistErrorFields = itemList.filter((item) => item.eventId === 65536).map(convertField);
     if (notExistErrorFields) {
-      postWarning(':exclamation: Reservations are not exist.', {
+      postWarning(':exclamation: Reservations does not exist.', {
         color: 'danger',
         fields: notExistErrorFields
       });

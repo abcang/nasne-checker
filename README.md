@@ -35,6 +35,7 @@ $ nasne-checker --nasne 192.168.10.10 \
 * 1.0.0: First release.
 * 1.1.0: Support the case the reservation does not exist.
 * 1.1.1: Remove nasne module.
+* 1.1.2: Fix the message.
 
 ## License
 MIT
