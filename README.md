@@ -21,7 +21,7 @@ Options:
   -V, --version      output the version number
   --nasne <host>     Nasne host (required)
   --slack <url>      Slack webhook url (required)
-  --interval [hour]  Execution interval
+  --interval <hour>  Execution interval (optional)
 ```
 
 Example:
@@ -36,6 +36,7 @@ $ nasne-checker --nasne 192.168.10.10 \
 * 1.1.0: Support the case the reservation does not exist.
 * 1.1.1: Remove nasne module.
 * 1.1.2: Fix the message.
+* 1.1.3: Fix interval option bug.
 
 ## License
 MIT

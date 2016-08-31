@@ -15,10 +15,10 @@ program.on('--help', () => {
 });
 
 program
-  .version('1.1.2')
+  .version('1.1.3')
   .option('--nasne <host>', 'Nasne host (required)')
   .option('--slack <url>', 'Slack webhook url (required)')
-  .option('--interval [hour]', 'Execution interval', 0)
+  .option('--interval <hour>', 'Execution interval (optional)', Number)
   .parse(process.argv);
 
 
@@ -88,6 +88,6 @@ function execute() {
 }
 
 execute();
-if (program.interval) {
+if (program.interval > 0) {
   setInterval(execute, program.interval * 3600 * 1000);
 }
