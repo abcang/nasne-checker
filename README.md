@@ -17,18 +17,20 @@ Usage: nasne-checker [options]
 
 Options:
 
-  -h, --help         output usage information
-  -V, --version      output the version number
-  --nasne <host>     Nasne host (required)
-  --slack <url>      Slack webhook url (required)
-  --interval <hour>  Execution interval (optional)
+  -h, --help             output usage information
+  -V, --version          output the version number
+  --nasne <host>         Nasne host (required)
+  --slack <url>          Slack webhook url (required)
+  --cron <format>        Cron format (optional)
+  --timezone <timezone>  When using cron option (Default is "Asia/Tokyo")
 ```
 
 Example:
 ```bash
-$ nasne-checker --nasne 192.168.10.10 \
+$ nasne-checker \
+  --nasne 192.168.10.10 \
   --slack https://hooks.slack.com/services/XXX/XXX/XXXXX \
-  --interval 24
+  --cron "00 20 * * 1,3,5"
 ```
 
 ## Changelog
@@ -37,6 +39,7 @@ $ nasne-checker --nasne 192.168.10.10 \
 * 1.1.1: Remove nasne module.
 * 1.1.2: Fix the message.
 * 1.1.3: Fix interval option bug.
+* 1.2.0: Add cron option and remove interval option.
 
 ## License
 MIT
