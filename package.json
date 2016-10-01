@@ -1,6 +1,6 @@
 {
   "name": "nasne-checker",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "A tool to check resavation on nasne and post to slack.",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

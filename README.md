@@ -40,6 +40,8 @@ $ nasne-checker \
 * 1.1.2: Fix the message.
 * 1.1.3: Fix interval option bug.
 * 1.2.0: Add cron option and remove interval option.
+* 1.2.1: Fix a bug that is executed first once when the cron option is enabled.
+
 
 ## License
 MIT

@@ -119,7 +119,6 @@ function execute() {
   });
 }
 
-execute();
 if (program.cron) {
   const job = new CronJob({
     cronTime: program.cron,
@@ -127,4 +126,6 @@ if (program.cron) {
     start: true,
     timeZone: program.timezone || 'Asia/Tokyo'
   });
+} else {
+  execute();
 }
