@@ -2,10 +2,10 @@
 
 const program = require('commander');
 const slackInitializer = require('slack-notify');
-const moment = require('moment');
-const {CronJob} = require('cron');
+const dayjs = require('dayjs');
+const cron = require('node-cron');
 const Nasne = require('../lib/nasne');
-const {version} = require('../package.json');
+const { version } = require('../package.json');
 
 
 program.on('--help', () => {
@@ -63,8 +63,8 @@ function convertEnclose(text) {
 }
 
 function convertField(item) {
-  const startTime = moment(item.startDateTime).format('YYYY/MM/DD(ddd) HH:mm');
-  const endTime = moment(item.startDateTime).add(item.duration, 's').format('HH:mm');
+  const startTime = dayjs(item.startDateTime).format('YYYY/MM/DD(ddd) HH:mm');
+  const endTime = dayjs(item.startDateTime).add(item.duration, 's').format('HH:mm');
   return {
     title: convertEnclose(item.title),
     value: `${startTime} - ${endTime}`,
@@ -95,7 +95,7 @@ function execute() {
 
   nasne.getReservedList().then((data) => {
     const itemList = data.item.sort((a, b) => (
-      moment(a.startDateTime) - moment(b.startDateTime))
+      dayjs(a.startDateTime) - dayjs(b.startDateTime))
     );
 
     const overlapErrorFields = itemList.filter((item) => item.conflictId > 0).map(convertField);
@@ -120,12 +120,7 @@ function execute() {
 }
 
 if (program.cron) {
-  const job = new CronJob({
-    cronTime: program.cron,
-    onTick: execute,
-    start: true,
-    timeZone: program.timezone || 'Asia/Tokyo'
-  });
+  cron.schedule(program.cron, execute), { timezone: program.timezone || 'Asia/Tokyo' }
 } else {
   execute();
 }
