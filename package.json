@@ -21,12 +21,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/ABCanG/nasne-checker.git"
+    "url": "https://github.com/abcang/nasne-checker.git"
   },
   "bugs": {
-    "url": "https://github.com/ABCanG/nasne-checker/issues"
+    "url": "https://github.com/abcang/nasne-checker/issues"
   },
-  "homepage": "https://github.com/ABCanG/nasne-checker",
-  "author": "ABCanG <abcang1015@gmail.com> (https://abcang.net/)",
+  "homepage": "https://github.com/abcang/nasne-checker",
+  "author": "abcang <abcang1015@gmail.com> (https://abcang.net/)",
   "license": "MIT"
 }
