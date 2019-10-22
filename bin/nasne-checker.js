@@ -79,22 +79,24 @@ function postWarning(text, attachment = null) {
   });
 }
 
-function execute() {
-  nasne.getHddDetail().then((data) => {
-    for (const hdd of data) {
+async function execute() {
+  try {
+    const hddDetails = await nasne.getHddDetail();
+    for (const hdd of hddDetails) {
       const parcent = Math.round((hdd.usedVolumeSize / hdd.totalVolumeSize) * 100);
       if (parcent > 90) {
         const type = hdd.internalFlag ? 'External' : 'Internal';
         postWarning(`:floppy_disk: The capacity of the ${type} HDD is insufficient (${parcent}% used).`);
       }
     }
-  }, (err) => {
+  } catch (err) {
     console.log(err);
     console.error('Failed to get information.');
-  });
+  }
 
-  nasne.getReservedList().then((data) => {
-    const itemList = data.item.sort((a, b) => (
+  try {
+    const reservedList = await nasne.getReservedList();
+    const itemList = reservedList.item.sort((a, b) => (
       dayjs(a.startDateTime) - dayjs(b.startDateTime))
     );
 
@@ -113,10 +115,10 @@ function execute() {
         fields: notExistErrorFields
       });
     }
-  }, (err) => {
+  } catch (err) {
     console.log(err);
     console.error('Failed to get information.');
-  });
+  }
 }
 
 if (program.cron) {
