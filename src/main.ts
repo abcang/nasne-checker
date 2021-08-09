@@ -1,12 +1,15 @@
 #!/usr/bin/env node
 
-const program = require('commander');
-const { IncomingWebhook } = require('@slack/webhook');
-const dayjs = require('dayjs');
-const cron = require('node-cron');
-const Nasne = require('../lib/nasne');
-const { version } = require('../package.json');
+import { Command } from 'commander';
+import { IncomingWebhook } from '@slack/webhook';
+import dayjs from 'dayjs';
+import cron from 'node-cron';
+import Nasne, { ReservedItem } from './nasne';
+import { version } from '../package.json';
+import { MessageAttachment } from '@slack/types';
 
+
+const program = new Command();
 
 program.on('--help', () => {
   console.log('  Examples:');
@@ -35,7 +38,7 @@ if (!program.nasne || !program.slack) {
 const nasne = new Nasne(program.nasne);
 const slack = new IncomingWebhook(program.slack);
 
-function convertEnclose(text) {
+function convertEnclose(text: string) {
   const enclose = [
     ['\ue0fd', '[手]'],
     ['\ue0fe', '[字]'],
@@ -62,7 +65,7 @@ function convertEnclose(text) {
   }, text);
 }
 
-function convertField(item) {
+function convertField(item: ReservedItem) {
   const startTime = dayjs(item.startDateTime).format('YYYY/MM/DD(ddd) HH:mm');
   const endTime = dayjs(item.startDateTime).add(item.duration, 's').format('HH:mm');
   return {
@@ -72,7 +75,7 @@ function convertField(item) {
   };
 }
 
-function postWarning(text, attachment = null) {
+function postWarning(text: string, attachment: MessageAttachment|null = null) {
   slack.send({
     text,
     ...(attachment ? { attachments: [attachment] } : {})
@@ -97,7 +100,7 @@ async function execute() {
   try {
     const reservedList = await nasne.getReservedList();
     const itemList = reservedList.item.sort((a, b) => (
-      dayjs(a.startDateTime) - dayjs(b.startDateTime))
+      dayjs(a.startDateTime).unix() - dayjs(b.startDateTime).unix())
     );
 
     const overlapErrorFields = itemList.filter((item) => item.conflictId > 0).map(convertField);

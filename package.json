@@ -3,11 +3,12 @@
   "version": "1.2.2",
   "description": "A tool to check resavation on nasne and post to slack.",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "rm -rf dist && ncc build src/main.ts --minify",
+    "dev": "ncc build src/main.ts --minify --v8-cache --source-map",
+    "watch": "ncc build src/main.ts --watch"
   },
-  "main": "lib/nasne.js",
   "bin": {
-    "nasne-checker": "bin/nasne-checker.js"
+    "nasne-checker": "dist/index.js"
   },
   "dependencies": {
     "@slack/webhook": "~6.0.0",
@@ -28,5 +29,11 @@
   },
   "homepage": "https://github.com/abcang/nasne-checker",
   "author": "abcang <abcang1015@gmail.com> (https://abcang.net/)",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^16.4.13",
+    "@types/node-cron": "^2.0.4",
+    "@vercel/ncc": "^0.29.0",
+    "typescript": "^4.3.5"
+  }
 }
