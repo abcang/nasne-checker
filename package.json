@@ -17,7 +17,7 @@
     "slack-notify": "~0.1.7"
   },
   "engines": {
-    "node": ">=10.0"
+    "node": ">= 12.13.0"
   },
   "repository": {
     "type": "git",
