@@ -28,15 +28,16 @@ program
   .option('--timezone <timezone>', 'When using cron option (Default is "Asia/Tokyo")')
   .parse(process.argv);
 
+const options = program.opts();
 
-if (!program.nasne || !program.slack) {
+if (!options.nasne || !options.slack) {
   console.log('"--nasne" option and "--slack" option are required.');
   program.outputHelp();
   process.exit(-1);
 }
 
-const nasne = new Nasne(program.nasne);
-const slack = new IncomingWebhook(program.slack);
+const nasne = new Nasne(options.nasne);
+const slack = new IncomingWebhook(options.slack);
 
 function convertEnclose(text: string) {
   const enclose = [
@@ -124,8 +125,8 @@ async function execute() {
   }
 }
 
-if (program.cron) {
-  cron.schedule(program.cron, execute), { timezone: program.timezone || 'Asia/Tokyo' }
+if (options.cron) {
+  cron.schedule(options.cron, execute), { timezone: options.timezone || 'Asia/Tokyo' }
 } else {
   execute();
 }
