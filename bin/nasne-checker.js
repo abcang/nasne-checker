@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const program = require('commander');
-const slackInitializer = require('slack-notify');
+const { IncomingWebhook } = require('@slack/webhook');
 const dayjs = require('dayjs');
 const cron = require('node-cron');
 const Nasne = require('../lib/nasne');
@@ -33,7 +33,7 @@ if (!program.nasne || !program.slack) {
 }
 
 const nasne = new Nasne(program.nasne);
-const slack = slackInitializer(program.slack);
+const slack = new IncomingWebhook(program.slack);
 
 function convertEnclose(text) {
   const enclose = [
@@ -73,9 +73,9 @@ function convertField(item) {
 }
 
 function postWarning(text, attachment = null) {
-  slack.request({
+  slack.send({
     text,
-    attachments: [attachment]
+    ...(attachment ? { attachments: [attachment] } : {})
   });
 }
 
