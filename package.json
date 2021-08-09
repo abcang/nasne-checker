@@ -5,6 +5,8 @@
   "scripts": {
     "build": "rm -rf dist && ncc build src/main.ts --minify",
     "dev": "ncc build src/main.ts --minify --v8-cache --source-map",
+    "lint": "eslint src/",
+    "lint:fix": "eslint src/ --fix",
     "watch": "ncc build src/main.ts --watch"
   },
   "bin": {
@@ -33,7 +35,13 @@
   "devDependencies": {
     "@types/node": "^16.4.13",
     "@types/node-cron": "^2.0.4",
+    "@typescript-eslint/eslint-plugin": "^4.29.0",
+    "@typescript-eslint/parser": "^4.29.0",
     "@vercel/ncc": "^0.29.0",
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^3.4.0",
+    "prettier": "^2.3.2",
     "typescript": "^4.3.5"
   }
 }
