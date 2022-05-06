@@ -32,7 +32,14 @@ program
   )
   .parse(process.argv);
 
-const options = program.opts();
+interface Options {
+  nasne?: string;
+  slack?: string;
+  cron?: string;
+  timezone?: string;
+}
+
+const options = program.opts<Options>();
 
 if (!options.nasne || !options.slack) {
   console.log('"--nasne" option and "--slack" option are required.');
@@ -145,7 +152,6 @@ async function execute() {
 if (options.cron) {
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   cron.schedule(options.cron, execute),
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     { timezone: options.timezone || "Asia/Tokyo" };
 } else {
   void execute();
