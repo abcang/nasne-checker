@@ -20,7 +20,7 @@
     "node-cron": "~2.0.3"
   },
   "engines": {
-    "node": ">= 12.13.0"
+    "node": ">= 14"
   },
   "repository": {
     "type": "git",
