@@ -3,7 +3,7 @@
 import { Command } from "commander";
 import { IncomingWebhook } from "@slack/webhook";
 import dayjs from "dayjs";
-import cron from "node-cron";
+import schedule from "node-schedule";
 import Nasne, { ReservedItem } from "./nasne";
 import { version } from "../package.json";
 import { MessageAttachment } from "@slack/types";
@@ -150,10 +150,13 @@ async function execute() {
 }
 
 if (options.cron) {
-  // eslint-disable-next-line @typescript-eslint/no-misused-promises
-  cron.schedule(options.cron, execute, {
-    timezone: options.timezone || "Asia/Tokyo",
-  });
+  schedule.scheduleJob(
+    {
+      rule: options.cron,
+      tz: options.timezone || "Asia/Tokyo",
+    },
+    execute
+  );
 } else {
   void execute();
 }
