@@ -151,8 +151,9 @@ async function execute() {
 
 if (options.cron) {
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
-  cron.schedule(options.cron, execute),
-    { timezone: options.timezone || "Asia/Tokyo" };
+  cron.schedule(options.cron, execute, {
+    timezone: options.timezone || "Asia/Tokyo",
+  });
 } else {
   void execute();
 }
