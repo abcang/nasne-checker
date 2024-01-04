@@ -21,7 +21,7 @@
     "node-schedule": "~2.1.1"
   },
   "engines": {
-    "node": ">= 14"
+    "node": ">= 18"
   },
   "repository": {
     "type": "git",
