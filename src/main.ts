@@ -16,7 +16,7 @@ program.on("--help", () => {
   console.log("    $ nasne-checker \\");
   console.log("      --nasne 192.168.10.10 \\");
   console.log(
-    "      --slack https://hooks.slack.com/services/XXX/XXX/XXXXX \\"
+    "      --slack https://hooks.slack.com/services/XXX/XXX/XXXXX \\",
   );
   console.log('      --cron "00 20 * * 1,3,5"');
 });
@@ -28,7 +28,7 @@ program
   .option("--cron <format>", "Cron format (optional)")
   .option(
     "--timezone <timezone>",
-    'When using cron option (Default is "Asia/Tokyo")'
+    'When using cron option (Default is "Asia/Tokyo")',
   )
   .parse(process.argv);
 
@@ -91,7 +91,7 @@ function convertField(item: ReservedItem) {
 
 async function postWarning(
   text: string,
-  attachment: MessageAttachment | null = null
+  attachment: MessageAttachment | null = null,
 ) {
   return slack.send({
     text,
@@ -104,12 +104,12 @@ async function execute() {
     const hddDetails = await nasne.getHddDetail();
     for (const hdd of hddDetails) {
       const parcent = Math.round(
-        (hdd.usedVolumeSize / hdd.totalVolumeSize) * 100
+        (hdd.usedVolumeSize / hdd.totalVolumeSize) * 100,
       );
       if (parcent > 90) {
         const type = hdd.internalFlag ? "External" : "Internal";
         await postWarning(
-          `:floppy_disk: The capacity of the ${type} HDD is insufficient (${parcent}% used).`
+          `:floppy_disk: The capacity of the ${type} HDD is insufficient (${parcent}% used).`,
         );
       }
     }
@@ -121,7 +121,7 @@ async function execute() {
   try {
     const reservedList = await nasne.getReservedList();
     const itemList = reservedList.item.sort(
-      (a, b) => dayjs(a.startDateTime).unix() - dayjs(b.startDateTime).unix()
+      (a, b) => dayjs(a.startDateTime).unix() - dayjs(b.startDateTime).unix(),
     );
 
     const overlapErrorFields = itemList
@@ -155,7 +155,7 @@ if (options.cron) {
       rule: options.cron,
       tz: options.timezone || "Asia/Tokyo",
     },
-    execute
+    execute,
   );
 } else {
   void execute();

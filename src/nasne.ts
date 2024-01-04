@@ -71,7 +71,7 @@ export default class Nasne {
   async get<Response>(
     port: number,
     path: string,
-    query: AxiosRequestConfig | undefined = undefined
+    query: AxiosRequestConfig | undefined = undefined,
   ): Promise<AxiosResponse<Response>> {
     return axios.get<Response>(`http://${this.host}:${port}${path}`, query);
   }
@@ -90,7 +90,7 @@ export default class Nasne {
           withDescriptionLong: 0,
           withUserData: 1,
         },
-      }
+      },
     );
 
     return data;
@@ -99,7 +99,7 @@ export default class Nasne {
   async getHddList(): Promise<HDDListResponse> {
     const { data } = await this.get<HDDListResponse>(
       64210,
-      "/status/HDDListGet"
+      "/status/HDDListGet",
     );
 
     return data;
@@ -111,7 +111,7 @@ export default class Nasne {
       "/status/HDDInfoGet",
       {
         params: { id },
-      }
+      },
     );
 
     return data;
@@ -122,7 +122,7 @@ export default class Nasne {
 
     const hdd = data.HDD.filter((info) => info.registerFlag === 1);
     const infoList = await Promise.all(
-      hdd.map((info) => this.getHddInfo(info.id))
+      hdd.map((info) => this.getHddInfo(info.id)),
     );
 
     return infoList.map((detail) => detail.HDD);
