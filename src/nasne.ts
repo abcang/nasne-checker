@@ -1,9 +1,11 @@
 import axios, { AxiosRequestConfig } from "axios";
 
-export type ErrorCode = number;
-export type HDDID = number;
-export type ReservedItemID = string;
-export type DatetimeString = string;
+type Brand<K, T> = K & { __brand: T };
+
+export type ErrorCode = Brand<number, "ErrorCode">;
+export type HddID = Brand<number, "HddID">;
+export type ReservedItemID = Brand<string, "ReservedItemID">;
+export type DatetimeString = Brand<string, "DatetimeString">;
 
 interface BaseResponse {
   errorcode: ErrorCode;
@@ -21,7 +23,7 @@ interface HddInfoResponse {
 }
 
 export interface HddInfo {
-  id: HDDID;
+  id: HddID;
   internalFlag: 0 | 1;
   mountStatus: 0 | 1;
   registerFlag: 0 | 1;
@@ -60,7 +62,7 @@ export interface ReservedItem {
   conflictId: number;
   mediaRemainAlertId: number;
   creatorId: number;
-  storageId: HDDID;
+  storageId: HddID;
   recordingFlag: number;
   priority: DatetimeString;
 }
@@ -107,7 +109,7 @@ export default class Nasne {
     return this.get<HDDListResponse>(64210, "/status/HDDListGet");
   }
 
-  async getHddInfo(id: HDDID): Promise<HddInfoResponse> {
+  async getHddInfo(id: HddID): Promise<HddInfoResponse> {
     return this.get<HddInfoResponse>(64210, "/status/HDDInfoGet", {
       params: { id },
     });
