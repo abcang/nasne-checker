@@ -13,7 +13,7 @@ program.on("--help", () => {
   console.log("  Examples:");
   console.log("");
   console.log("    $ nasne-checker \\");
-  console.log("      --nasne 192.168.10.10 \\");
+  console.log('      --nasne "192.168.10.10 192.168.10.11" \\');
   console.log(
     "      --slack https://hooks.slack.com/services/XXX/XXX/XXXXX \\",
   );
@@ -22,7 +22,7 @@ program.on("--help", () => {
 
 program
   .version(version)
-  .option("--nasne <host>", "Nasne host (required)")
+  .option("--nasne <hosts>", "Nasne hosts (required)")
   .option("--slack <url>", "Slack webhook url (required)")
   .option("--cron <format>", "Cron format (optional)")
   .option(
@@ -46,12 +46,15 @@ if (!options.nasne || !options.slack) {
   process.exit(-1);
 }
 
-const nasne = new Nasne(options.nasne);
 const slack = new IncomingWebhook(options.slack);
-const checker = new Checker(nasne, slack);
+const nasneHostList = options.nasne.split(" ").filter((v) => v);
+const nasneList = nasneHostList.map((host) => new Nasne(host));
+const checkerList = nasneList.map((nasne) => new Checker(nasne, slack));
 
 async function execute() {
-  await checker.checkAndPostSlack();
+  for (const checker of checkerList) {
+    await checker.checkAndPostSlack();
+  }
 }
 
 if (options.cron) {
