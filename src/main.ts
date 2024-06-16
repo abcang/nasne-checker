@@ -51,8 +51,7 @@ const slack = new IncomingWebhook(options.slack);
 const checker = new Checker(nasne, slack);
 
 async function execute() {
-  await checker.checkHddAndPostSlack();
-  await checker.checkReservedListAndPostSlack();
+  await checker.checkAndPostSlack();
 }
 
 if (options.cron) {

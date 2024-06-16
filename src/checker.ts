@@ -13,7 +13,20 @@ export default class Checker {
     this.slack = slack;
   }
 
-  async checkHddAndPostSlack() {
+  async checkAndPostSlack() {
+    const blocks = [
+      ...(await this.checkHddAndMakeSlackBlocks()),
+      ...(await this.checkReservedListAndMakeSlackBlocks()),
+    ];
+
+    if (blocks.length > 0) {
+      await this.slack.send({
+        blocks,
+      });
+    }
+  }
+
+  private async checkHddAndMakeSlackBlocks() {
     try {
       const hddDetails = await this.getHddDetail();
       const hddFormattedDetails = hddDetails.map((hdd) => {
@@ -36,47 +49,50 @@ export default class Checker {
           (detail) => detail.usedPercent > InsufficientPercent,
         )
       ) {
-        await this.slack.send({
-          blocks: [
-            {
-              type: "rich_text",
-              elements: [
-                {
-                  type: "rich_text_section",
-                  elements: [
-                    { type: "emoji", name: "floppy_disk" },
-                    { type: "text", text: " Insufficient HDD capacity.\n" },
-                  ],
-                },
-                {
-                  type: "rich_text_list",
-                  style: "bullet",
-                  elements: hddFormattedDetails.map((detail) => {
-                    return {
-                      type: "rich_text_section",
-                      elements: [
-                        { type: "text", text: `${detail.type}: ` },
-                        {
-                          type: "text",
-                          text: `Used ${detail.usedPercent}% (${detail.usedVolumeSizeGB}GB / ${detail.totalVolumeSizeGB}GB)`,
-                        },
-                      ],
-                    };
-                  }),
-                },
-              ],
-            },
-          ],
-        });
+        return [
+          {
+            type: "rich_text",
+            elements: [
+              {
+                type: "rich_text_section",
+                elements: [
+                  { type: "emoji", name: "floppy_disk" },
+                  { type: "text", text: " Insufficient HDD capacity.\n" },
+                ],
+              },
+              {
+                type: "rich_text_list",
+                style: "bullet",
+                elements: hddFormattedDetails.map((detail) => {
+                  return {
+                    type: "rich_text_section",
+                    elements: [
+                      { type: "text", text: `${detail.type}: ` },
+                      {
+                        type: "text",
+                        text: `Used ${detail.usedPercent}% (${detail.usedVolumeSizeGB}GB / ${detail.totalVolumeSizeGB}GB)`,
+                      },
+                    ],
+                  };
+                }),
+              },
+            ],
+          },
+        ];
       }
+
+      return [];
     } catch (err) {
       console.log(err);
-      console.error("Failed to get information.");
+      console.error("Failed to get HDD information.");
+
+      return makeSlackBlocksForError("Failed to get HDD information.");
     }
   }
 
-  async checkReservedListAndPostSlack() {
+  private async checkReservedListAndMakeSlackBlocks() {
     try {
+      const blocks = [];
       const reservedList = await this.nasne.getReservedList();
       const itemList = reservedList.item.sort(
         (a, b) => dayjs(a.startDateTime).unix() - dayjs(b.startDateTime).unix(),
@@ -86,42 +102,42 @@ export default class Checker {
         (item) => item.conflictId > 0,
       );
       if (overlapErrorReservations.length) {
-        await this.slack.send({
-          blocks: [
-            {
-              type: "section",
-              text: {
-                type: "plain_text",
-                text: ":warning: Reservations are overlap.",
-                emoji: true,
-              },
+        blocks.push(
+          {
+            type: "section",
+            text: {
+              type: "plain_text",
+              text: ":warning: Reservations are overlap.",
+              emoji: true,
             },
-            ...overlapErrorReservations.map(makeSlackBlockForReservation),
-          ],
-        });
+          },
+          ...overlapErrorReservations.map(makeSlackBlockForReservation),
+        );
       }
 
       const notExistErrorReservations = itemList.filter(
         (item) => item.eventId === 65536,
       );
       if (notExistErrorReservations.length) {
-        await this.slack.send({
-          blocks: [
-            {
-              type: "section",
-              text: {
-                type: "plain_text",
-                text: ":exclamation: Reservations does not exist.",
-                emoji: true,
-              },
+        blocks.push(
+          {
+            type: "section",
+            text: {
+              type: "plain_text",
+              text: ":no_entry: Reservations does not exist.",
+              emoji: true,
             },
-            ...overlapErrorReservations.map(makeSlackBlockForReservation),
-          ],
-        });
+          },
+          ...overlapErrorReservations.map(makeSlackBlockForReservation),
+        );
       }
+
+      return blocks;
     } catch (err) {
       console.log(err);
-      console.error("Failed to get information.");
+      console.error("Failed to get reservation information.");
+
+      return makeSlackBlocksForError("Failed to get reservation information.");
     }
   }
 
@@ -191,4 +207,21 @@ function makeSlackBlockForReservation(item: ReservedItem) {
       },
     ],
   };
+}
+
+function makeSlackBlocksForError(text: string) {
+  return [
+    {
+      type: "rich_text",
+      elements: [
+        {
+          type: "rich_text_section",
+          elements: [
+            { type: "emoji", name: "bangbang" },
+            { type: "text", text: ` ${text}\n` },
+          ],
+        },
+      ],
+    },
+  ];
 }
