@@ -44,7 +44,9 @@ export interface HddInfo {
 
 interface ReservedListResponse {
   errorcode: ErrorCode;
-  item: ReservedItem[];
+  item?: ReservedItem[];
+  totalMatches: number;
+  numberReturned: number;
 }
 
 export interface ReservedItem {

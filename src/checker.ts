@@ -117,7 +117,7 @@ export default class Checker {
     try {
       const blocks = [];
       const reservedList = await this.nasne.getReservedList();
-      const itemList = reservedList.item.sort(
+      const itemList = (reservedList.item ?? []).sort(
         (a, b) => dayjs(a.startDateTime).unix() - dayjs(b.startDateTime).unix(),
       );
 
