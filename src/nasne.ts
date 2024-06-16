@@ -1,9 +1,20 @@
-import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
+import axios, { AxiosRequestConfig } from "axios";
 
-export type ErrorCode = number;
-export type HDDID = number;
-export type ReservedItemID = string;
-export type DatetimeString = string;
+type Brand<K, T> = K & { __brand: T };
+
+export type ErrorCode = Brand<number, "ErrorCode">;
+export type HddID = Brand<number, "HddID">;
+export type ReservedItemID = Brand<string, "ReservedItemID">;
+export type DatetimeString = Brand<string, "DatetimeString">;
+
+interface BaseResponse {
+  errorcode: ErrorCode;
+}
+
+interface NameResponse {
+  errorcode: ErrorCode;
+  name: string;
+}
 
 interface HDDListResponse {
   errorcode: ErrorCode;
@@ -17,7 +28,7 @@ interface HddInfoResponse {
 }
 
 export interface HddInfo {
-  id: HDDID;
+  id: HddID;
   internalFlag: 0 | 1;
   mountStatus: 0 | 1;
   registerFlag: 0 | 1;
@@ -33,7 +44,9 @@ export interface HddInfo {
 
 interface ReservedListResponse {
   errorcode: ErrorCode;
-  item: ReservedItem[];
+  item?: ReservedItem[];
+  totalMatches: number;
+  numberReturned: number;
 }
 
 export interface ReservedItem {
@@ -56,7 +69,7 @@ export interface ReservedItem {
   conflictId: number;
   mediaRemainAlertId: number;
   creatorId: number;
-  storageId: HDDID;
+  storageId: HddID;
   recordingFlag: number;
   priority: DatetimeString;
 }
@@ -68,63 +81,48 @@ export default class Nasne {
     this.host = host;
   }
 
-  async get<Response>(
+  private async get<Response extends BaseResponse>(
     port: number,
     path: string,
     query: AxiosRequestConfig | undefined = undefined,
-  ): Promise<AxiosResponse<Response>> {
-    return axios.get<Response>(`http://${this.host}:${port}${path}`, query);
+  ): Promise<Response> {
+    const { data } = await axios.get<Response>(
+      `http://${this.host}:${port}${path}`,
+      query,
+    );
+
+    if (data.errorcode > 0) {
+      throw Error(`Request Failed: ${data.errorcode}`);
+    }
+
+    return data;
   }
 
   async getReservedList(): Promise<ReservedListResponse> {
-    const { data } = await this.get<ReservedListResponse>(
-      64220,
-      "/schedule/reservedListGet",
-      {
-        params: {
-          searchCriteria: 0,
-          filter: 0,
-          startingIndex: 0,
-          requestedCount: 0,
-          sortCriteria: 0,
-          withDescriptionLong: 0,
-          withUserData: 1,
-        },
+    return this.get<ReservedListResponse>(64220, "/schedule/reservedListGet", {
+      params: {
+        searchCriteria: 0,
+        filter: 0,
+        startingIndex: 0,
+        requestedCount: 0,
+        sortCriteria: 0,
+        withDescriptionLong: 0,
+        withUserData: 1,
       },
-    );
+    });
+  }
 
-    return data;
+  async getServerName(): Promise<NameResponse> {
+    return this.get<NameResponse>(64210, "/status/boxNameGet");
   }
 
   async getHddList(): Promise<HDDListResponse> {
-    const { data } = await this.get<HDDListResponse>(
-      64210,
-      "/status/HDDListGet",
-    );
-
-    return data;
+    return this.get<HDDListResponse>(64210, "/status/HDDListGet");
   }
 
-  async getHddInfo(id: HDDID): Promise<HddInfoResponse> {
-    const { data } = await this.get<HddInfoResponse>(
-      64210,
-      "/status/HDDInfoGet",
-      {
-        params: { id },
-      },
-    );
-
-    return data;
-  }
-
-  async getHddDetail(): Promise<HddInfo[]> {
-    const data = await this.getHddList();
-
-    const hdd = data.HDD.filter((info) => info.registerFlag === 1);
-    const infoList = await Promise.all(
-      hdd.map((info) => this.getHddInfo(info.id)),
-    );
-
-    return infoList.map((detail) => detail.HDD);
+  async getHddInfo(id: HddID): Promise<HddInfoResponse> {
+    return this.get<HddInfoResponse>(64210, "/status/HDDInfoGet", {
+      params: { id },
+    });
   }
 }
