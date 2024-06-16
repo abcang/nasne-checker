@@ -116,15 +116,4 @@ export default class Nasne {
 
     return data;
   }
-
-  async getHddDetail(): Promise<HddInfo[]> {
-    const data = await this.getHddList();
-
-    const hdd = data.HDD.filter((info) => info.registerFlag === 1);
-    const infoList = await Promise.all(
-      hdd.map((info) => this.getHddInfo(info.id)),
-    );
-
-    return infoList.map((detail) => detail.HDD);
-  }
 }
