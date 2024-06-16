@@ -43,6 +43,7 @@ $ nasne-checker \
 * 1.2.1: Fix a bug that is executed first once when the cron option is enabled.
 * 1.2.2: Update dependencies
 * 2.0.0: Update dependencies and drop support for Node.js 10.x and 11.x.
+* 3.0.0: Support for multiple nasne.
 
 ## License
 MIT
