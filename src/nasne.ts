@@ -1,9 +1,13 @@
-import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
+import axios, { AxiosRequestConfig } from "axios";
 
 export type ErrorCode = number;
 export type HDDID = number;
 export type ReservedItemID = string;
 export type DatetimeString = string;
+
+interface BaseResponse {
+  errorcode: ErrorCode;
+}
 
 interface HDDListResponse {
   errorcode: ErrorCode;
@@ -68,52 +72,44 @@ export default class Nasne {
     this.host = host;
   }
 
-  async get<Response>(
+  private async get<Response extends BaseResponse>(
     port: number,
     path: string,
     query: AxiosRequestConfig | undefined = undefined,
-  ): Promise<AxiosResponse<Response>> {
-    return axios.get<Response>(`http://${this.host}:${port}${path}`, query);
+  ): Promise<Response> {
+    const { data } = await axios.get<Response>(
+      `http://${this.host}:${port}${path}`,
+      query,
+    );
+
+    if (data.errorcode > 0) {
+      throw Error(`Request Failed: ${data.errorcode}`);
+    }
+
+    return data;
   }
 
   async getReservedList(): Promise<ReservedListResponse> {
-    const { data } = await this.get<ReservedListResponse>(
-      64220,
-      "/schedule/reservedListGet",
-      {
-        params: {
-          searchCriteria: 0,
-          filter: 0,
-          startingIndex: 0,
-          requestedCount: 0,
-          sortCriteria: 0,
-          withDescriptionLong: 0,
-          withUserData: 1,
-        },
+    return this.get<ReservedListResponse>(64220, "/schedule/reservedListGet", {
+      params: {
+        searchCriteria: 0,
+        filter: 0,
+        startingIndex: 0,
+        requestedCount: 0,
+        sortCriteria: 0,
+        withDescriptionLong: 0,
+        withUserData: 1,
       },
-    );
-
-    return data;
+    });
   }
 
   async getHddList(): Promise<HDDListResponse> {
-    const { data } = await this.get<HDDListResponse>(
-      64210,
-      "/status/HDDListGet",
-    );
-
-    return data;
+    return this.get<HDDListResponse>(64210, "/status/HDDListGet");
   }
 
   async getHddInfo(id: HDDID): Promise<HddInfoResponse> {
-    const { data } = await this.get<HddInfoResponse>(
-      64210,
-      "/status/HDDInfoGet",
-      {
-        params: { id },
-      },
-    );
-
-    return data;
+    return this.get<HddInfoResponse>(64210, "/status/HDDInfoGet", {
+      params: { id },
+    });
   }
 }
