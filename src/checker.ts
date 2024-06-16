@@ -20,8 +20,31 @@ export default class Checker {
     ];
 
     if (blocks.length > 0) {
+      let name = "unknown";
+      try {
+        const response = await this.nasne.getServerName();
+        name = response.name;
+      } catch (err) {
+        console.log(err);
+        console.error("Failed to get server name.");
+
+        blocks.push(...makeSlackBlocksForError("Failed to get server name."));
+      }
+
       await this.slack.send({
-        blocks,
+        blocks: [
+          ...blocks,
+          {
+            type: "context",
+            elements: [
+              {
+                type: "plain_text",
+                text: `name: ${name} | host: ${this.nasne.host}`,
+                emoji: true,
+              },
+            ],
+          },
+        ],
       });
     }
   }

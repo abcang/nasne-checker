@@ -11,6 +11,11 @@ interface BaseResponse {
   errorcode: ErrorCode;
 }
 
+interface NameResponse {
+  errorcode: ErrorCode;
+  name: string;
+}
+
 interface HDDListResponse {
   errorcode: ErrorCode;
   number: number;
@@ -103,6 +108,10 @@ export default class Nasne {
         withUserData: 1,
       },
     });
+  }
+
+  async getServerName(): Promise<NameResponse> {
+    return this.get<NameResponse>(64210, "/status/boxNameGet");
   }
 
   async getHddList(): Promise<HDDListResponse> {
