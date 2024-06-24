@@ -151,7 +151,7 @@ export default class Checker {
               emoji: true,
             },
           },
-          ...overlapErrorReservations.map(makeSlackBlockForReservation),
+          ...notExistErrorReservations.map(makeSlackBlockForReservation),
         );
       }
 
